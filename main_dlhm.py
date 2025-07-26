@@ -42,7 +42,8 @@ for i in range(folders):
         amp = (amp - np.min(amp))/(np.max(amp) - np.min(amp))
 
 
-        cv.imwrite()
+        cv.imwrite(f"/home/spm061102/Documents/TDG/Dataset/Wheat/src_ph/src{i}", ph*255)
+        cv.imwrite(f"/home/spm061102/Documents/TDG/Dataset/Wheat/src_ph/src{i}", amp*255)
         
         num += 1
 
