@@ -1,9 +1,8 @@
 from torchmetrics.image import StructuralSimilarityIndexMeasure
 from torch import nn
 from torch.nn import functional as F
-import torch
 from torch.fft import fft2, fftshift, rfft2
-
+import torch
 
 class MSELoss(nn.Module):
     def __init__(self,):
@@ -143,9 +142,10 @@ class Unet(nn.Module):
     def __init__(self, filters):
         super().__init__()
 
-        self.batch_norm = nn.BatchNorm2d(filters)
+        
 
         self.encoder1 = nn.Conv2d(1, filters, kernel_size=4, stride=2, padding=1)
+        self.batch_norm = nn.BatchNorm2d(filters)
         self.encoder2 = EncoderBlock(filters, filters*2, norm=True)
         self.encoder3 = EncoderBlock(filters*2, filters*4, norm=True)
         self.encoder4 = EncoderBlock(filters*4, filters*8, norm=True)
