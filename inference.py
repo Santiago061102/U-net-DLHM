@@ -16,10 +16,8 @@ log_data = "/home/spm061102/Documents/TDG/models/July_22_2025_10_47PM_Hybrid_los
 train_holo = "/home/spm061102/Documents/TDG/Dataset/Cancer blood cells/src_ph/src0.png"
 train_ph_gt = "/home/spm061102/Documents/TDG/Dataset/Cancer blood cells/tar_ph/tar0.png"
 
-
 val_holo = "/home/spm061102/Documents/TDG/Dataset/Cancer blood cells/src_ph/src3400.png"
 val_ph_gt = "/home/spm061102/Documents/TDG/Dataset/Cancer blood cells/tar_ph/tar3400.png"
-
 
 usaf_holo = "/home/spm061102/Documents/TDG/Dataset/Cancer blood cells/src_ph/src3400.png"
 usaf_ph_gt = "/home/spm061102/Documents/TDG/Dataset/Cancer blood cells/tar_ph/tar3400.png"
@@ -90,4 +88,21 @@ axes[0, 2].axis('off') # Optional: Turn off axes ticks and labels
 axes[1, 2].imshow(output_usaf, cmap='gray')
 axes[1, 2].axis('off') # Optional: Turn off axes ticks and labels
 
-plt.show()
+#plt.show()
+
+
+with open(f'{log_data}', 'r') as file:
+    data = json.load(file)
+
+
+y_train = np.array(data["train_loss"])
+x_train = np.shape(y_train)
+
+y_val = data["val_loss"]
+x_val = len(y_val)
+
+
+
+
+
+print(y_train)
