@@ -4,6 +4,7 @@ from datetime import datetime
 from PIL import Image
 import numpy as np
 from torch import nn
+import stat
 
 class Data(Dataset):
     def __init__(self,
@@ -36,10 +37,11 @@ class Data(Dataset):
 
 class Logger():
     def __init__(self,
-                 exp_name: str='/home/spascuasm/models',
+                 exp_name: str='/home/spm061102/Documents/TDG/models',
                  filename: str=None):
         self.exp_name=exp_name
         self.cache={}
+        os.chmod(exp_name, stat.S_IRWXU)
         if not os.path.exists(exp_name):
             os.makedirs(exp_name, exist_ok=True)
         self.date=datetime.today().strftime("%B_%d_%Y_%I_%M%p")
