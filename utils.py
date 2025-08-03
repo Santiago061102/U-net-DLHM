@@ -1,10 +1,10 @@
 from torch.utils.data.dataset import Dataset
-import torch, os, glob, json
+from torch import nn
 from datetime import datetime
 from PIL import Image
 import numpy as np
-from torch import nn
-import stat
+import torch, os, glob, json, stat
+
 
 class Data(Dataset):
     def __init__(self,
