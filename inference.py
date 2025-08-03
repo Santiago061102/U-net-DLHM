@@ -32,6 +32,7 @@ usaf_ph_gt = "/home/spm061102/Documents/TDG/Dataset/Cancer blood cells/tar_ph/ta
 
 # GPU o CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
 
 
 # U-Net model load, with the same structure of the one trained
@@ -130,8 +131,7 @@ y_val = [value for _, value in data_val.items()]
 
 plt.plot(x_train,y_train, color='maroon')
 plt.plot(x_val,y_val, color='green')
-
 plt.xlabel('Epochs')
-plt.xticks(np.arange(0, len(x_train)-1, step = (len(x_train))//20))
 plt.ylabel('Loss')
+plt.xticks(np.arange(0, len(x_train)+1, step = (len(x_train))/10)-1)
 plt.show()

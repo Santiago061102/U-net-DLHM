@@ -1,21 +1,9 @@
-import os
-import glob
-import json
-import time
-import torch
-from torch import nn
-from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from progress.bar import IncrementalBar
-from PIL import Image
-from torch.utils.data.dataset import Dataset
-from datetime import datetime
 from network import *
 from utils import *
-from torchmetrics.image import StructuralSimilarityIndexMeasure
 from torch.optim.lr_scheduler import LinearLR, ReduceLROnPlateau
-import numpy as np
-import matplotlib.pyplot as plt
+import os, glob, json,time, torch
 
 
 
@@ -27,6 +15,7 @@ args = {
     "im_size": 256,
     "filts": 64,
     "num_images": 2400,
+    "data_path": '/home/spm061102/Documents/TDG/Dataset/Emojis',
     "other": "40 MSE 60 SSIM, cells dataset, factor 0.5 and pat 20, tanh as output function and 0.5 Dropout"
 }
 
@@ -35,6 +24,7 @@ logger.historical(args)
 
 
 device = ('cuda' if torch.cuda.is_available() else 'cpu')
+print(device)
 im_size = args["im_size"]
 transforms = Compose([Resize((im_size,im_size)),
                       ToTensor()])
@@ -49,8 +39,8 @@ optimizer = torch.optim.Adam(unet.parameters(), lr=args["lr"], betas=(0.5, 0.999
 u_crit = HybLoss(lmb1 = 0.4, lmb2 = 0.6).to(device)
 
 # Dataset
-dataset = Data(root='/home/spascuasm/dataset/White blood cells', transform=transforms, num_images = args["num_images"], mode = 'train')
-dataset_val = Data(root='/home/spascuasm/dataset/White blood cells', transform=transforms, num_images = args["num_images"], mode = 'val')
+dataset = Data(root=args["data_path"], transform=transforms, num_images = args["num_images"], mode = 'train')
+dataset_val = Data(root=args["data_path"], transform=transforms, num_images = args["num_images"], mode = 'val')
 
 dataloader = DataLoader(dataset, batch_size=args["batch_size"], shuffle=True)
 dataloader_val = DataLoader(dataset_val, batch_size=args["batch_size"], shuffle=True)
