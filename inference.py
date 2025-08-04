@@ -1,6 +1,7 @@
 from network import *
 from utils import *
 from PIL import Image
+from skimage.metrics import structural_similarity as ssim
 import numpy as np
 import matplotlib.pyplot as plt
 import torch, json, cv2
@@ -16,8 +17,8 @@ with train and  validation loss.
 '''
 
 # Model and loss data paths
-path_model = r'/home/spm061102/Documents/TDG/models/august3/August_03_2025_10_23AM_Hybrid_loss3_3Dfigs_unet.pt'
-log_data = r'/home/spm061102/Documents/TDG/models/august3/August_03_2025_10_23AM_Hybrid_loss3_3Dfigs.json'
+path_model = r'/home/spm061102/Documents/TDG/others/August_03_2025_05_07PM_Hybrid_loss1_cells_unet.pt'
+log_data = r'/home/spm061102/Documents/TDG/others/August_03_2025_05_07PM_Hybrid_loss1_cells.json'
 
 # Images for inference
 train_holo = r'/home/spm061102/Documents/TDG/Dataset/White blood cells/src/src0.png'
@@ -26,8 +27,8 @@ train_ph_gt = r'/home/spm061102/Documents/TDG/Dataset/White blood cells/tar_ph/t
 val_holo = r'/home/spm061102/Documents/TDG/Dataset/Wheat/src/src300.png'
 val_ph_gt = r'/home/spm061102/Documents/TDG/Dataset/Wheat/tar_ph/tar300.png'
 
-usaf_holo = r'/home/spm061102/Documents/TDG/Dataset/Rand figs/src/src400.png'
-usaf_ph_gt = r'/home/spm061102/Documents/TDG/Dataset/Rand figs/tar_ph/tar_ph400.png'
+test_holo = r'/home/spm061102/Documents/TDG/Dataset/Rand figs/src/src400.png'
+test_ph_gt = r'/home/spm061102/Documents/TDG/Dataset/Rand figs/tar_ph/tar_ph400.png'
 
 
 # GPU o CPU
@@ -48,18 +49,21 @@ transforms = Compose([Resize((256,256)),
 
 
 train_holo1 = Image.open(train_holo).convert('L')
-train_ph_gt1 = Image.open(train_ph_gt).convert('L')
+train_ph_gt1 = np.array(Image.open(train_ph_gt).convert('L'))
+train_ph_gt1 = (train_ph_gt1 - np.min(train_ph_gt1))/(np.max(train_ph_gt1) - np.min(train_ph_gt1))
 
 val_holo1 = Image.open(val_holo).convert('L')
-val_ph_gt1 = Image.open(val_ph_gt).convert('L')
+val_ph_gt1 = np.array(Image.open(val_ph_gt).convert('L'))
+val_ph_gt1 = (val_ph_gt1 - np.min(val_ph_gt1))/(np.max(val_ph_gt1) - np.min(val_ph_gt1))
 
-usaf_holo1 = Image.open(usaf_holo).convert('L')
-usaf_ph_gt1 = Image.open(usaf_ph_gt).convert('L')
+test_holo1 = Image.open(test_holo).convert('L')
+test_ph_gt1 = np.array(Image.open(test_ph_gt).convert('L'))
+test_ph_gt1 = (test_ph_gt1 - np.min(test_ph_gt1))/(np.max(test_ph_gt1) - np.min(test_ph_gt1))
 
 # Transformation apply
 input_train = transforms(train_holo1).unsqueeze(0)
 input_val = transforms(val_holo1).unsqueeze(0)
-input_usaf = transforms(usaf_holo1).unsqueeze(0)
+input_test = transforms(test_holo1).unsqueeze(0)
 
 
 
@@ -71,18 +75,34 @@ with torch.no_grad():
     output_val = model(input_val)
 
 with torch.no_grad():
-    output_usaf = model(input_usaf)
+    output_test = model(input_test)
 
-# To CPU and numpy, must be rotate
+# To CPU and numpy, must be rotate and normalized
 output_train = output_train[0,0,:,:].cpu().numpy()
 output_train = cv2.rotate(cv2.flip(output_train, 1), cv2.ROTATE_90_COUNTERCLOCKWISE)
-
+output_train = (output_train - np.min(output_train))/(np.max(output_train) - np.min(output_train))
 
 output_val = output_val[0,0,:,:].cpu().numpy()
 output_val = cv2.rotate(cv2.flip(output_val, 1), cv2.ROTATE_90_COUNTERCLOCKWISE)
+output_val = (output_val - np.min(output_val))/(np.max(output_val) - np.min(output_val))
 
-output_usaf = output_usaf[0,0,:,:].cpu().numpy()
-output_usaf = cv2.rotate(cv2.flip(output_usaf, 1), cv2.ROTATE_90_COUNTERCLOCKWISE)
+output_test = output_test[0,0,:,:].cpu().numpy()
+output_test = cv2.rotate(cv2.flip(output_test, 1), cv2.ROTATE_90_COUNTERCLOCKWISE)
+output_test = (output_test - np.min(output_test))/(np.max(output_test) - np.min(output_test))
+
+# The MSE of the train, validation and test images are calculated and displayed
+mse_train = np.mean((train_ph_gt1 - output_train)**2)
+mse_val = np.mean((val_ph_gt1 - output_val)**2)
+mse_test = np.mean((test_ph_gt1 - output_test)**2)
+
+
+# The SSIM of the train, validation and test images are calculated and displayed
+(ssim_train, diff) = ssim(train_ph_gt1, output_train, full=True, data_range=train_ph_gt1.max() - train_ph_gt1.min())
+(ssim_val, diff) = ssim(val_ph_gt1, output_val, full=True, data_range=val_ph_gt1.max() - val_ph_gt1.min())
+(ssim_test, diff) = ssim(test_ph_gt1, output_test, full=True, data_range=test_ph_gt1.max() - test_ph_gt1.min())
+
+print(f'MSE: Train {mse_train}, Validation {mse_val}, Test {mse_test}')
+print(f'SSIM: Train {ssim_train}, Validation {ssim_val}, Test {ssim_test}')
 
 
 # Visualization of the inferences
@@ -104,11 +124,11 @@ axes[1, 1].imshow(output_val, cmap='gray')
 axes[1, 1].axis('off') # Optional: Turn off axes ticks and labels
 
 
-axes[0, 2].imshow(usaf_ph_gt1, cmap='gray')
+axes[0, 2].imshow(test_ph_gt1, cmap='gray')
 axes[0, 2].set_title('Usaf') # Optional: Add titles to subplots
 axes[0, 2].axis('off') # Optional: Turn off axes ticks and labels
 
-axes[1, 2].imshow(output_usaf, cmap='gray')
+axes[1, 2].imshow(output_test, cmap='gray')
 axes[1, 2].axis('off') # Optional: Turn off axes ticks and labels
 
 plt.show()
