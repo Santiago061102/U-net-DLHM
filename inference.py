@@ -16,18 +16,18 @@ with train and  validation loss.
 '''
 
 # Model and loss data paths
-path_model = "/home/spm061102/Documents/TDG/models/July_22_2025_10_47PM_Hybrid_loss1_cells_unet.pt"
-log_data = "/home/spm061102/Documents/TDG/models/July_23_2025_03_19AM_Hybrid_loss2_cells.json"
+path_model = r'/home/spm061102/Documents/TDG/models/august3/August_03_2025_10_23AM_Hybrid_loss3_3Dfigs_unet.pt'
+log_data = r'/home/spm061102/Documents/TDG/models/august3/August_03_2025_10_23AM_Hybrid_loss3_3Dfigs.json'
 
 # Images for inference
-train_holo = "/home/spm061102/Documents/TDG/Dataset/Cancer blood cells/src_ph/src0.png"
-train_ph_gt = "/home/spm061102/Documents/TDG/Dataset/Cancer blood cells/tar_ph/tar0.png"
+train_holo = r'/home/spm061102/Documents/TDG/Dataset/White blood cells/src/src0.png'
+train_ph_gt = r'/home/spm061102/Documents/TDG/Dataset/White blood cells/tar_ph/tar0.png'
 
-val_holo = "/home/spm061102/Documents/TDG/Dataset/Cancer blood cells/src_ph/src3400.png"
-val_ph_gt = "/home/spm061102/Documents/TDG/Dataset/Cancer blood cells/tar_ph/tar3400.png"
+val_holo = r'/home/spm061102/Documents/TDG/Dataset/Wheat/src/src300.png'
+val_ph_gt = r'/home/spm061102/Documents/TDG/Dataset/Wheat/tar_ph/tar300.png'
 
-usaf_holo = "/home/spm061102/Documents/TDG/Dataset/Cancer blood cells/src_ph/src3400.png"
-usaf_ph_gt = "/home/spm061102/Documents/TDG/Dataset/Cancer blood cells/tar_ph/tar3400.png"
+usaf_holo = r'/home/spm061102/Documents/TDG/Dataset/Rand figs/src/src400.png'
+usaf_ph_gt = r'/home/spm061102/Documents/TDG/Dataset/Rand figs/tar_ph/tar_ph400.png'
 
 
 # GPU o CPU
