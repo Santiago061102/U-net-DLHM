@@ -10,24 +10,24 @@ class Data(Dataset):
     def __init__(self,
                  root: str="/home/spascuasm/models",
                  transform=None,
-                 num_images=5000,
+                 numImages=5000,
                  mode: str='train'):
         self.root=root
         self.mode = mode
         if self.mode == 'train':
-            self.files_src=sorted(glob.glob(f"{root}/src_ph/*.png"))[0:int(num_images*0.8)]
-            self.files_tar=sorted(glob.glob(f"{root}/tar_ph/*.png"))[0:int(num_images*0.8)]
+            self.filesSrc=sorted(glob.glob(f"{root}/src/*.png"))[0:int(numImages*0.8)]
+            self.filesTar=sorted(glob.glob(f"{root}/tar_ph/*.png"))[0:int(numImages*0.8)]
         else:
-            self.files_src=sorted(glob.glob(f"{root}/src_ph/*.png"))[int(num_images*0.8):num_images]
-            self.files_tar=sorted(glob.glob(f"{root}/tar_ph/*.png"))[int(num_images*0.8):num_images]
+            self.filesSrc=sorted(glob.glob(f"{root}/src/*.png"))[int(numImages*0.8):numImages]
+            self.filesTar=sorted(glob.glob(f"{root}/tar_ph/*.png"))[int(numImages*0.8):numImages]
         self.transform=transform
 
     def __len__(self,):
-        return len(self.files_src)
+        return len(self.filesSrc)
 
     def __getitem__(self, idx):
-        imgA = Image.open(self.files_src[idx]).convert('L')
-        imgB = Image.open(self.files_tar[idx]).convert('L')
+        imgA = Image.open(self.filesSrc[idx]).convert('L')
+        imgB = Image.open(self.filesTar[idx]).convert('L')
 
         if self.transform:
             imgA, imgB = self.transform(imgA, imgB)
@@ -37,19 +37,19 @@ class Data(Dataset):
 
 class Logger():
     def __init__(self,
-                 exp_name: str='/home/spm061102/Documents/TDG/models',
+                 expName: str='/home/spm061102/Documents/TDG/models',
                  filename: str=None):
-        self.exp_name=exp_name
+        self.expName=expName
         self.cache={}
-        os.chmod(exp_name, stat.S_IRWXU)
-        if not os.path.exists(exp_name):
-            os.makedirs(exp_name, exist_ok=True)
+        os.chmod(expName, stat.S_IRWXU)
+        if not os.path.exists(expName):
+            os.makedirs(expName, exist_ok=True)
         self.date=datetime.today().strftime("%B_%d_%Y_%I_%M%p")
         if filename is None:
             self.filename=self.date
         else:
             self.filename="_".join([self.date, filename])
-        fpath = f"{self.exp_name}/{self.filename}.json"
+        fpath = f"{self.expName}/{self.filename}.json"
         with open(fpath, 'w') as f:
             data = json.dumps(self.cache)
             f.write(data)
@@ -68,19 +68,19 @@ class Logger():
       return None
 
     def save_weights(self, state_dict, model_name: str='model'):
-        fpath = f"{self.exp_name}/{self.filename}_{model_name}.pt"
+        fpath = f"{self.expName}/{self.filename}_{model_name}.pt"
         torch.save(state_dict, fpath)
         return None
 
     def update(self,):
-        fpath = f"{self.exp_name}/{self.filename}.json"
+        fpath = f"{self.expName}/{self.filename}.json"
         with open(fpath, 'w') as f:
             data = json.dumps(self.cache)
             f.write(data)
         return None
 
     def close(self,):
-        fpath = f"{self.exp_name}/{self.filename}.json"
+        fpath = f"{self.expName}/{self.filename}.json"
         with open(fpath, 'w') as f:
             data = json.dumps(self.cache)
             f.write(data)

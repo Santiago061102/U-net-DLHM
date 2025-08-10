@@ -78,14 +78,14 @@ class HybLoss(nn.Module):
 
     def forward(self, fake, real):
 
-        mse_loss = self.mse(real, fake)
-        ssim_loss = 1- self.ssim(real, fake)
+        mseLoss = self.mse(real, fake)
+        ssimLoss = 1- self.ssim(real, fake)
 
         lap_tar = kornia.filters.laplacian(fake, kernel_size=3)
         lap_real = kornia.filters.laplacian(real, kernel_size=3)
         mse_lap = self.mse(lap_real, lap_tar)
 
-        return mse_loss*self.lmb1 + ssim_loss*self.lmb2
+        return mseLoss*self.lmb1 + ssimLoss*self.lmb2
 
 
 
