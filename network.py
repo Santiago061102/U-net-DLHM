@@ -97,7 +97,7 @@ class HybLoss(nn.Module):
 
 class EncoderBlock(nn.Module):
     """Encoder block"""
-    def __init__(self, inplanes, outplanes, kernel_size=4, stride=2, padding=1, norm=True):
+    def __init__(self, inplanes, outplanes,  kernel_size=4, stride=2, padding=1, norm=True):
         super().__init__()
         self.lrelu = nn.LeakyReLU(0.2, inplace=True)
         self.conv = nn.Conv2d(inplanes, outplanes, kernel_size, stride, padding)
@@ -117,7 +117,7 @@ class EncoderBlock(nn.Module):
 
 class DecoderBlock(nn.Module):
     """Decoder block"""
-    def __init__(self, inplanes, outplanes, kernel_size=4, stride=2, padding=1, dropout=False):
+    def __init__(self, inplanes, outplanes,  kernel_size=4, stride=2, padding=1, dropout=False):
         super().__init__()
         self.relu = nn.ReLU(inplace=True)
         self.deconv = nn.ConvTranspose2d(inplanes, outplanes, kernel_size, stride, padding)
@@ -137,14 +137,14 @@ class DecoderBlock(nn.Module):
 
         return fx
 
-class Unet(nn.Module):
+class UNet(nn.Module):
     """Unet-like Encoder-Decoder model"""
     def __init__(self, filters):
         super().__init__()
 
         
 
-        self.encoder1 = nn.Conv2d(1, filters, kernel_size=4, stride=2, padding=1)
+        self.encoder1 = nn.Conv2d(1, filters,  kernel_size=4, stride=2, padding=1)
         self.batch_norm = nn.BatchNorm2d(filters)
         self.encoder2 = EncoderBlock(filters, filters*2, norm=True)
         self.encoder3 = EncoderBlock(filters*2, filters*4, norm=True)
@@ -161,7 +161,7 @@ class Unet(nn.Module):
         self.decoder4 = DecoderBlock(2*filters*8, filters*4, dropout=True)
         self.decoder3 = DecoderBlock(2*filters*4, filters*2, dropout=True)
         self.decoder2 = DecoderBlock(2*filters*2, filters, dropout=True)
-        self.decoder1 = nn.ConvTranspose2d(2*filters, 1, kernel_size=4, stride=2, padding=1)
+        self.decoder1 = nn.ConvTranspose2d(2*filters, 1,  kernel_size=4, stride=2, padding=1)
 
     def forward(self, x):
         # encoder forward
