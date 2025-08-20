@@ -14,19 +14,6 @@ class MSELoss(nn.Module):
         return loss
 
 
-# class LapLoss(nn.Module):
-#     def __init__(self,):
-#         super().__init__()
-#         self.mse=nn.MSELoss()
-    
-#     def forward(self, pred, real):
-#         lap_tar = kornia.filters.laplacian(pred, kernel_size=3)
-#         lap_real = kornia.filters.laplacian(real, kernel_size=3)
-        
-#         loss = self.mse(lap_real, lap_tar)
-#         return loss
-
-
 class SSIMLoss(nn.Module):
     def __init__(self,):
         super().__init__()
@@ -35,7 +22,7 @@ class SSIMLoss(nn.Module):
     def forward(self, fake, real):
         loss = 1 - self.ssim(fake, real)
         return loss
-
+    
 
 class FourierLossMSE(nn.Module):
     def __init__(self, lmb1 = 0.5, lmb2 = 0.5):
