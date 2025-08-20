@@ -1,7 +1,6 @@
 from network import *
 from utils import *
 from PIL import Image
-from skimage.metrics import structural_similarity as ssim
 import numpy as np
 import matplotlib.pyplot as plt
 import torch, json, cv2
@@ -15,8 +14,8 @@ with train and  validation loss.
 '''
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 # Model and loss data paths
-pathModel = r'/home/spm061102/Documents/TDG/models/models/August_15_2025_12_07AM_Rand_figs1_beta1_unet.pt'
-logData = r'/home/spm061102/Documents/TDG/models/models/August_15_2025_12_07AM_Rand_figs1_beta1.json'
+pathModel = r'/home/spm061102/Documents/TDG/models/models/August_18_2025_03_46PM_Rand_fig3_beta1_unet.pt'
+logData = r'/home/spm061102/Documents/TDG/models/models/August_18_2025_03_46PM_Rand_fig3_beta1.json'
 
 # Images for inference
 pathTrainHolo = r'/home/spm061102/Documents/TDG/Dataset/random shapes/src/src0.png'
@@ -35,11 +34,14 @@ print(device)
 
 
 # U-Net model load, with the same structure of the one trained
-model = UNet(filters=64)
+model = UNet(filters=52)
 model.load_state_dict(torch.load(pathModel, map_location=torch.device(device), weights_only=True))
 
 # Evaluation mode
 model.eval()
+
+ssim = SSIMLoss()
+mse = MSELoss()
 
 imgSize = 256
 # Resize tranformation
@@ -77,36 +79,33 @@ with torch.no_grad():
 with torch.no_grad():
     outputTest = model(inputTest)
 
-crit = SSIMLoss()
-ssimTrain = crit(trainPhGT, outputTrain)
-ssimVal = crit(valPhGT, outputVal)
-ssimTest = crit(testPhGT, outputTest)
-
-# To CPU and numpy, must be rotate and normalized
-outputTrain = outputTrain[0,0,:,:].cpu().numpy()
-outputTrain = cv2.rotate(cv2.flip(outputTrain, 1), cv2.ROTATE_90_COUNTERCLOCKWISE)
-
-outputVal = outputVal[0,0,:,:].cpu().numpy()
-outputVal = cv2.rotate(cv2.flip(outputVal, 1), cv2.ROTATE_90_COUNTERCLOCKWISE)
-
-outputTest = outputTest[0,0,:,:].cpu().numpy()
-outputTest = cv2.rotate(cv2.flip(outputTest, 1), cv2.ROTATE_90_COUNTERCLOCKWISE)
+# The SSIM of the train, validation and test images are calculated and displayed
+ssimTrain = ssim(trainPhGT, outputTrain)
+ssimVal = ssim(valPhGT, outputVal)
+ssimTest = ssim(testPhGT, outputTest)
 
 # The MSE of the train, validation and test images are calculated and displayed
-trainPhGT = trainPhGT[0,0,:,:].numpy()
-valPhGT = valPhGT[0,0,:,:].numpy()
-testPhGT = testPhGT[0,0,:,:].numpy()
+mseTrain = mse(trainPhGT, outputTrain)
+mseVal = mse(valPhGT, outputVal)
+mseTest = mse(testPhGT, outputTest)
 
-mseTrain = np.mean((trainPhGT- outputTrain)**2)
-mseVal = np.mean((valPhGT - outputVal)**2)
-mseTest = np.mean((testPhGT - outputTest)**2)
-
-
-# The SSIM of the train, validation and test images are calculated and displayed
 
 print(f'MSE: Train {mseTrain:.5f}, Validation {mseVal:5f}, Test {mseTest:5f}')
 print(f'SSIM: Train {ssimTrain:.5f}, Validation {ssimVal:.5f}, Test {ssimTest:.5f}')
 
+# To CPU and numpy, must be rotate and normalized
+outputTrain = outputTrain[0,0,:,:].cpu().numpy()
+#outputTrain = cv2.rotate(cv2.flip(outputTrain, 1), cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+outputVal = outputVal[0,0,:,:].cpu().numpy()
+#outputVal = cv2.rotate(cv2.flip(outputVal, 1), cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+outputTest = outputTest[0,0,:,:].cpu().numpy()
+#outputTest = cv2.rotate(cv2.flip(outputTest, 1), cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+trainPhGT = trainPhGT[0,0,:,:].numpy()
+valPhGT = valPhGT[0,0,:,:].numpy()
+testPhGT = testPhGT[0,0,:,:].numpy()
 
 
 # Visualization of the inferences
