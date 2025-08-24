@@ -14,18 +14,18 @@ with train and  validation loss.
 '''
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 # Model and loss data paths
-pathModel = r'/home/spm061102/Documents/TDG/models/models/August_18_2025_03_46PM_Rand_fig3_beta1_unet.pt'
-logData = r'/home/spm061102/Documents/TDG/models/models/August_18_2025_03_46PM_Rand_fig3_beta1.json'
+pathModel = r'C:\Users\santi\OneDrive\Documentos\Semestre 10\TDG\models\august21\August_21_2025_10_13PM_Rand_figs1_beta1_unet.pt'
+logData = r'C:\Users\santi\OneDrive\Documentos\Semestre 10\TDG\models\august21\August_21_2025_10_13PM_Rand_figs1_beta1.json'
 
 # Images for inference
-pathTrainHolo = r'/home/spm061102/Documents/TDG/Dataset/random shapes/src/src0.png'
-pathTrainPhGT = r'/home/spm061102/Documents/TDG/Dataset/random shapes/tar_ph/tar_ph0.png'
+pathTrainHolo = r'C:\Users\santi\OneDrive\Documentos\Semestre 10\TDG\Dataset\rand figs\src\src0.png'
+pathTrainPhGT = r'C:\Users\santi\OneDrive\Documentos\Semestre 10\TDG\Dataset\rand figs\tar_ph\tar_ph0.png'
 
-pathValHolo = r'/home/spm061102/Documents/TDG/Dataset/white blood cells/src/src0.png'
-pathValPhGT = r'/home/spm061102/Documents/TDG/Dataset/white blood cells/tar_ph/tar0.png'
+pathValHolo = r'C:\Users\santi\OneDrive\Documentos\Semestre 10\TDG\Dataset\white blood cells\src\src0.png'
+pathValPhGT = r'C:\Users\santi\OneDrive\Documentos\Semestre 10\TDG\Dataset\white blood cells\tar_ph\tar0.png'
 
-pathTestHolo = r'/home/spm061102/Documents/TDG/Dataset/test/src/src0.png'
-pathTestPhGT = r'/home/spm061102/Documents/TDG/Dataset/test/tar_ph/tar_ph0.png'
+pathTestHolo = r'C:\Users\santi\OneDrive\Documentos\Semestre 10\TDG\Dataset\test\src\src0.png'
+pathTestPhGT = r'C:\Users\santi\OneDrive\Documentos\Semestre 10\TDG\Dataset\test\tar_ph\tar_ph0.png'
 
 
 # GPU o CPU
@@ -152,8 +152,9 @@ xVal = [key for key, _ in dataVal.items()]
 yVal = [value for _, value in dataVal.items()]
 
 
-plt.plot(xTrain,yTrain, color='maroon')
-plt.plot(xVal,yVal, color='green')
+plt.plot(xTrain,yTrain, color='maroon', label = "Train")
+plt.plot(xVal,yVal, color='green', label = "Validation")
+plt.legend()
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.xticks(np.arange(0, len(xTrain)+1, step = (len(xTrain))/10)-1)

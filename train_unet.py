@@ -3,24 +3,24 @@ from progress.bar import IncrementalBar
 from network import *
 from utils import *
 from torch.optim.lr_scheduler import LinearLR, ReduceLROnPlateau
-import os, glob, json,time, torch
+import os, time, torch
 
 
 
-
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 args = {
-    "epochs": 1000,
-    "batch_size": 128,
+    "epochs": 10,
+    "batch_size": 4,
     "lr": 0.0005,
     "im_size": 256,
-    "filts": 64,
-    "num_images": 2400,
-    "data_path": '/home/spm061102/Documents/TDG/Dataset/Emojis',
+    "filts": 2,
+    "num_images": 200,
+    "data_path": '/home/spm061102/Documents/TDG/Dataset/emojis',
     "other": "40 MSE 60 SSIM, cells dataset, factor 0.5 and pat 20, tanh as output function and 0.5 Dropout"
 }
 
 logger = Logger(filename="Hybrid_loss1_cells")
-logger.historical(args)
+#logger.historical(args)
 
 
 device = ('cuda' if torch.cuda.is_available() else 'cpu')
@@ -29,18 +29,21 @@ im_size = args["im_size"]
 transforms = Compose([Resize((im_size,im_size)),
                       ToTensor()])
 
-unet = Unet(filters = args["filts"]).to(device)
+unet = UNet(filters=64).to(device)
 unet.apply(initialize_weights)
 
 # Optimizers
 optimizer = torch.optim.Adam(unet.parameters(), lr=args["lr"], betas=(0.5, 0.999))
 
 # Loss
-u_crit = HybLoss(lmb1 = 0.4, lmb2 = 0.6).to(device)
+u_crit = SSIMLoss().to(device)
 
+
+total_params = sum(param.numel() for param in unet.parameters())
+print(f"Total number of parameters: {total_params}")
 # Dataset
-dataset = Data(root=args["data_path"], transform=transforms, num_images = args["num_images"], mode = 'train')
-dataset_val = Data(root=args["data_path"], transform=transforms, num_images = args["num_images"], mode = 'val')
+dataset = Data(root=args["data_path"], transform=transforms, numImages = args["num_images"], mode = 'train')
+dataset_val = Data(root=args["data_path"], transform=transforms, numImages = args["num_images"], mode = 'val')
 
 dataloader = DataLoader(dataset, batch_size=args["batch_size"], shuffle=True)
 dataloader_val = DataLoader(dataset_val, batch_size=args["batch_size"], shuffle=True)
@@ -62,12 +65,17 @@ for epoch in range(args["epochs"]):
         tar = tar.to(device)
 
         # Unet training loss
-        pred = unet(src)
-        loss = u_crit(pred, tar)
+        with torch.amp.autocast(device):
+            pred = unet(src)
+            loss = u_crit(pred, tar)
+            print(loss)
+        #pred = unet(src)
+        #loss = u_crit(pred, tar)
 
         # Generator`s params update
         optimizer.zero_grad()
         loss.backward()
+        loss.detach()
         #torch.nn.utils.clip_grad_norm_(unet.parameters())
         
         optimizer.step()
@@ -85,9 +93,12 @@ for epoch in range(args["epochs"]):
             # Unet inference and loss for validation
             pred = unet(src)
             loss = u_crit(pred, tar)
+            
+            
 
         # add batch losses
             val_loss += loss.item()
+            del pred, loss, src, tar
     bar.finish()
     # obtain per epoch losses
     train_loss = train_loss/len(dataloader)
