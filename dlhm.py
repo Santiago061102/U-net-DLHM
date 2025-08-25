@@ -98,7 +98,7 @@ def dlhm(sample, dx_in, L, z, W_c, dx_out, wavelength, x0=0, y0=0, NA_s=0):
 
     # Compute hologram using inverse Fourier transform
     Uz = ifts(fts(sample) * E)
-    holo = np.abs(Uz)
+    holoUnd = np.abs(Uz)
 
     # Distortion of the coordinates
     # Calculate maximum distortion due to distance differences
@@ -107,7 +107,7 @@ def dlhm(sample, dx_in, L, z, W_c, dx_out, wavelength, x0=0, y0=0, NA_s=0):
     # Apply distortion to the hologram
     camMat = np.array([[P, 0, P / 2], [0, Q, Q / 2], [0, 0, 1]])
     distCoeffs = np.array([-Dist_max / (2 * Mag), 0, 0, 0, 0])  # Radial distortion parameters
-    holo = cv.undistort(holo.astype(np.float32), camMat, distCoeffs)
+    holo = cv.undistort(holoUnd.astype(np.float32), camMat, distCoeffs)
 
     # Normalize and post-process the hologram
     holo = holo - np.min(holo)
