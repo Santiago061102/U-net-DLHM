@@ -22,9 +22,9 @@ from v2Model import UNet  # v2: Optimized Attention-Based UNet
 # CONFIG — edit these paths before running
 # ---------------------------------------------------------------------------
 
-MODEL = r"C:\Users\santi\Desktop\Resultados\final_model2\ph\v.2 Optimized Phase Attention-Based UNet .pt"
-SRC   = r"C:\Users\santi\Downloads\Phase.png"
-GT    = r"C:\Users\santi\Documents\TDG\Dataset\benchmark_melo\tar_ph\00000_benchmark1.png"  # set to None to skip metrics
+MODEL = r".\v.2 Optimized Phase Attention-Based UNet .pt"
+SRC   = r".\Phase.png"
+GT    = r".\tar_ph\00000_benchmark1.png"  # set to None to skip metrics
 
 MODE  = "phase"   # "phase" or "amplitude"
 SIZE  = 256
