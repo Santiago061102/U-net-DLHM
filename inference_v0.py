@@ -22,9 +22,9 @@ from v0Model import UNet  # v0: plain UNet
 # CONFIG — edit these paths before running
 # ---------------------------------------------------------------------------
 
-MODEL = r"C:\Users\santi\Desktop\Resultados\other_models\v.0 UNet model.pt"
-SRC   = r"C:\Users\santi\Downloads\Phase.png"
-GT    = r"C:\Users\santi\Documents\TDG\Dataset\benchmark_melo\tar_ph\00000_benchmark1.png"  # set to None to skip metrics
+MODEL = r".\v.0 UNet model.pt"
+SRC   = r".\Phase.png"
+GT    = r"C.\tar_ph\00000_benchmark1.png"  # set to None to skip metrics
 
 MODE  = "phase"   # "phase" or "amplitude"
 SIZE  = 256
